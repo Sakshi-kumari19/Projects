@@ -1,0 +1,181 @@
+import java.time.LocalDateTime;
+class User {
+    private static int userCount = 0;
+    private int userID;
+    private String username;
+    private String password;
+
+
+    User(String username,String password) {
+        this.userID = ++userCount;
+        this.username = username;
+        this.password = password;
+    }
+
+    public int getUserID() {
+        return userID;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+}
+
+class Post {
+    private static int postCount = 0;
+
+    private int postId;
+    private User creator;
+    private String content;
+    private LocalDateTime PostDate;
+    private int likes;
+    private String comments;
+
+    public Post(User creator, String content) {
+        this.postId = ++postCount;
+        this.creator = creator;
+        this.content = content;
+        this.PostDate = LocalDateTime.now();
+        this.comments = "";
+        this.likes = 0;
+    }
+
+    public int getPostId() {
+        return postId;
+    }
+
+    public User getcreator() {
+        return creator;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public LocalDateTime getPostDate() {
+        return PostDate;
+    }
+
+    public String getComments() {
+        return comments;
+    }
+
+    public int getlikes() {
+        return likes;
+    }
+
+    public void addComment(String comment) {
+        comments += comment + "\n";
+    }
+
+    public void addlike() {
+        likes++;
+    }
+
+    public void delete(User user, Post[] posts, int postCount) {
+        if (creator.equals(user)) {
+
+            int index = -1;
+            for (int i = 0; i < postCount; i++) {
+                if (posts[i] != null && posts[i].getPostId() == this.postId) {
+                    index = i;
+                    break;
+                }
+            }
+
+            if (index != -1) {
+
+                for (int j = index; j < postCount - 1; j++) {
+                    posts[j] = posts[j + 1];
+                }
+                posts[postCount - 1] = null;
+                System.out.println("Post deleted successfully.");
+            } else {
+                System.out.println("Error: Post not found.");
+            }
+        } else {
+            System.out.println("Error: You don't have permission to delete this post.");
+        }
+    }
+}
+
+
+
+    class PostService {
+        private static final int MAX_POSTS = 100;
+        private Post[] posts;
+        private int postCount;
+
+        public PostService() {
+            this.posts = new Post[MAX_POSTS];
+            this.postCount = 0;
+        }
+
+        public void createPost(User creator, String content) {
+            if (postCount < MAX_POSTS) {
+                posts[postCount++] = new Post(creator, content);
+                System.out.println("Post created successfully.");
+            } else {
+                System.out.println("Maximum post limit reached. Cannot create a new post.");
+            }
+        }
+
+        public void deletePost(User user, int postId) {
+            for (int i = 0; i < postCount; i++) {
+                if (posts[i] != null && posts[i].getPostId() == postId) {
+                    posts[i].delete(user, posts, postCount);
+                    return;
+                }
+            }
+            System.out.println("Post not found or you don't have permission to delete.");
+        }
+
+        public Post[] getPosts() {
+            return posts;
+        }
+    }
+
+
+     class AuthenticationManager {
+        private String[] usernames;
+        private String[] passwords;
+         private int userCount;
+
+
+        public AuthenticationManager() {
+            this.usernames = new String[100];
+            this.passwords = new String[100];
+            this.userCount = 0;
+
+        }
+
+        public boolean authenticate(String username, String password) {
+            for (int i = 0; i < usernames.length; i++) {
+                if (usernames[i].equals(username) && passwords[i].equals(password)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+         public boolean createUser(String username, String password) {
+             if (userCount < usernames.length) {
+
+                 for (int i = 0; i < userCount; i++) {
+                     if (usernames[i].equals(username)) {
+                         return false;
+                     }
+                 }
+
+                 usernames[userCount] = username;
+                 passwords[userCount] = password;
+                 userCount++;
+                 return true;
+             } else {
+                 return false;
+             }
+         }
+    }
+
+
+
